@@ -6,6 +6,9 @@
 package encryption.ui;
 
 import encryption.Configuration;
+import encryption.watcher.InputFolderWatcher;
+import encryption.watcher.OutputFolderWatcher;
+import encryption.watcher.ProjectFolderWatcher;
 import encryption.Project;
 import encryption.algorithm.Algorithm;
 import java.util.logging.Level;
@@ -18,6 +21,10 @@ import javax.swing.JFileChooser;
  */
 public class ProjectForm extends javax.swing.JPanel {
 
+    
+    private InputFolderWatcher inputWatcher;
+    private OutputFolderWatcher outputWatcher;
+    
     /**
      * Creates new form ProjectForm
      */
@@ -263,15 +270,24 @@ public class ProjectForm extends javax.swing.JPanel {
 
     private void chooseInputFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseInputFolderButtonActionPerformed
         int ret = inputFolderChooser.showOpenDialog(this);
-        if(ret == JFileChooser.APPROVE_OPTION)
+        if(ret == JFileChooser.APPROVE_OPTION){
             project.setInputFolder(inputFolderChooser.getSelectedFile());
+            if(inputWatcher != null) inputWatcher.setWatch(false);
+            inputWatcher = new InputFolderWatcher(project);
+            inputWatcher.start();
+        }
+            
         
     }//GEN-LAST:event_chooseInputFolderButtonActionPerformed
 
     private void chooseOutputFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseOutputFolderButtonActionPerformed
         int ret = outputFolderChooser.showOpenDialog(this);
-        if(ret == JFileChooser.APPROVE_OPTION)
+        if(ret == JFileChooser.APPROVE_OPTION){
             project.setOutputFolder(outputFolderChooser.getSelectedFile());
+            if(outputWatcher != null) outputWatcher.setWatch(false);
+            outputWatcher = new OutputFolderWatcher(project);
+            outputWatcher.start();
+        }
     }//GEN-LAST:event_chooseOutputFolderButtonActionPerformed
 
     private void chooseAlgorithmConfigurationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseAlgorithmConfigurationButtonActionPerformed
@@ -280,14 +296,12 @@ public class ProjectForm extends javax.swing.JPanel {
             try {
                 Configuration configuration = new Configuration(algorithmConfigurationChooser.getSelectedFile());
                 project.setAlgorithm(new Algorithm(configuration));
-                project.work();
             } catch (Exception ex) {
                 Logger.getLogger(ProjectForm.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_chooseAlgorithmConfigurationButtonActionPerformed
 
-    
     
     public Project getProject() {
         return project;

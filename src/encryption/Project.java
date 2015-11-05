@@ -9,9 +9,11 @@ import encryption.algorithm.Algorithm;
 import encryption.ui.TextFileFilter;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -22,38 +24,15 @@ import java.util.logging.Logger;
  *
  * @author marko
  */
+
 public class Project implements Serializable{
     
     private Algorithm algorithm;
     
+    private final int BUFFER_SIZE = 10 * 1024;
+    
     public Project() {
         propertyChangeSupport = new PropertyChangeSupport(this);
-    }
-
-    
-    private Configuration configuration;
-    private transient final PropertyChangeSupport propertyChangeSupport;
-    
-    public static final String PROP_CONFIGURATION = "configuration";
-
-    /**
-     * Get the value of configuration
-     *
-     * @return the value of configuration
-     */
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    /**
-     * Set the value of configuration
-     *
-     * @param configuration new value of configuration
-     */
-    public void setConfiguration(Configuration configuration) {
-        Configuration oldConfiguration = this.configuration;
-        this.configuration = configuration;
-        propertyChangeSupport.firePropertyChange(PROP_CONFIGURATION, oldConfiguration, configuration);
     }
     
     private File outputFolder;
@@ -81,7 +60,7 @@ public class Project implements Serializable{
         refreshOutputFiles();
     }
     
-    private void refreshOutputFiles(){
+    public synchronized void refreshOutputFiles(){
         File[] filesInFolder = outputFolder.listFiles(new TextFileFilter());
         setOutputFiles(Arrays.asList(filesInFolder));
     }
@@ -111,7 +90,7 @@ public class Project implements Serializable{
         refreshInputFiles();
     }
     
-    private void refreshInputFiles(){
+    public synchronized void refreshInputFiles(){
         File[] filesInFolder = inputFolder.listFiles(new TextFileFilter());
         //configuration.set("inputFiles", createFilesListString(filesInFolder));
         setInputFiles(Arrays.asList(filesInFolder));
@@ -178,27 +157,43 @@ public class Project implements Serializable{
         return algorithm;
     }
     
-    
-    public void work() {
-        char[] buffer = new char[1024]; // 1KB
-        for(Object input : inputFiles){
+    public void encrypt(File file) {
+        if(algorithm != null){
+            File output = new File(outputFolder, file.getName());
             try {
-                FileReader fr = new FileReader((File) input);
-                for(int i = 0; i < buffer.length; i++) buffer[i] = 0;
-                fr.read(buffer);
+                FileWriter fr = new FileWriter(output);
+                fr.write(algorithm.encrypt(readFile(file)));
                 fr.close();
-                
-                String inputStr = new String(buffer);
-                String outputStr = algorithm.Encrypt(inputStr);
-                
-                System.out.println(outputStr);
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
     
-
+    public String decrypt(File file) {
+        return algorithm.decrypt(readFile(file));
+    }
+    
+    String readFile(File file){
+        StringBuilder sb = new StringBuilder();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line = br.readLine();
+            while (line != null) {
+                sb.append(line);
+                sb.append("\n");
+                line = br.readLine();
+            }
+            br.close();
+        } catch (Exception e) {
+            
+        }
+        
+        return sb.toString();
+    }
+    
+    private transient final PropertyChangeSupport propertyChangeSupport;
+    
     /**
      * Add PropertyChangeListener.
      *

@@ -5,10 +5,6 @@
  */
 package encryption.ui;
 
-import encryption.Configuration;
-import encryption.Project;
-import javax.swing.JFileChooser;
-
 /**
  *
  * @author marko
@@ -31,45 +27,9 @@ public class MainForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        project = new encryption.Project();
-        projectChooser = new javax.swing.JFileChooser();
         projectForm = new encryption.ui.ProjectForm();
-        mainMenuBar = new javax.swing.JMenuBar();
-        fileMenu = new javax.swing.JMenu();
-        newProjectMenuItem = new javax.swing.JMenuItem();
-        openProjectMenuItem = new javax.swing.JMenuItem();
-        saveProjectMenuItem = new javax.swing.JMenuItem();
-        editMenu = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        fileMenu.setText("File");
-
-        newProjectMenuItem.setText("New Project");
-        newProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newProjectMenuItemActionPerformed(evt);
-            }
-        });
-        fileMenu.add(newProjectMenuItem);
-
-        openProjectMenuItem.setText("Open Project");
-        openProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                openProjectMenuItemActionPerformed(evt);
-            }
-        });
-        fileMenu.add(openProjectMenuItem);
-
-        saveProjectMenuItem.setText("Save Project");
-        fileMenu.add(saveProjectMenuItem);
-
-        mainMenuBar.add(fileMenu);
-
-        editMenu.setText("Edit");
-        mainMenuBar.add(editMenu);
-
-        setJMenuBar(mainMenuBar);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -84,31 +44,12 @@ public class MainForm extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(projectForm, javax.swing.GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE)
+                .addComponent(projectForm, javax.swing.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void newProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newProjectMenuItemActionPerformed
-        project = new Project();
-        projectForm.setProject(project);
-    }//GEN-LAST:event_newProjectMenuItemActionPerformed
-
-    private void openProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openProjectMenuItemActionPerformed
-        int result = projectChooser.showOpenDialog(this);
-        if(result == JFileChooser.APPROVE_OPTION){
-            try {
-                Configuration configuration = new Configuration(projectChooser.getSelectedFile());
-                project = new Project();
-                project.setConfiguration(configuration);
-                projectForm.setProject(project);
-            } catch (Exception ex) {
-                
-            }
-        }
-    }//GEN-LAST:event_openProjectMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -146,14 +87,6 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu editMenu;
-    private javax.swing.JMenu fileMenu;
-    private javax.swing.JMenuBar mainMenuBar;
-    private javax.swing.JMenuItem newProjectMenuItem;
-    private javax.swing.JMenuItem openProjectMenuItem;
-    private encryption.Project project;
-    private javax.swing.JFileChooser projectChooser;
     private encryption.ui.ProjectForm projectForm;
-    private javax.swing.JMenuItem saveProjectMenuItem;
     // End of variables declaration//GEN-END:variables
 }

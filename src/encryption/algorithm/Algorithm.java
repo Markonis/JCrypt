@@ -21,24 +21,24 @@ public class Algorithm {
  
     
     /**
-     * Encrypt the given string
+     * encrypt the given string
      * 
      * @param input
      * @return Encrypted representation of the input according to configuration
      */
     
-    public String Encrypt(String input) {
+    public String encrypt(String input) {
         return input;
     }
     
     /**
-     * Decrypt the given string
+     * decrypt the given string
      * 
      * @param input
      * @return Original string from the encrypted input
      */
     
-    public String Decrypt(String input) {
+    public String decrypt(String input) {
         return input;
     }
     
