@@ -15,6 +15,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -57,12 +58,15 @@ public class Project implements Serializable{
         this.outputFolder = outputFolder;
         //configuration.set("outputFolder", outputFolder.getAbsolutePath());
         propertyChangeSupport.firePropertyChange(PROP_OUTPUTFOLDER, oldOutputFolder, outputFolder);
-        refreshOutputFiles();
+        diffEncrypt();
+        refreshFiles();
     }
     
     public synchronized void refreshOutputFiles(){
-        File[] filesInFolder = outputFolder.listFiles(new TextFileFilter());
-        setOutputFiles(Arrays.asList(filesInFolder));
+        if(outputFolder != null){
+            File[] filesInFolder = outputFolder.listFiles(new TextFileFilter(".jcrypt"));
+            setOutputFiles(Arrays.asList(filesInFolder));
+        }
     }
     
     private File inputFolder;
@@ -87,13 +91,16 @@ public class Project implements Serializable{
         this.inputFolder = inputFolder;
         //configuration.set("inputFolder", inputFolder.getAbsolutePath());
         propertyChangeSupport.firePropertyChange(PROP_INPUTFOLDER, oldInputFolder, inputFolder);
-        refreshInputFiles();
+        diffEncrypt();
+        refreshFiles();
     }
     
     public synchronized void refreshInputFiles(){
-        File[] filesInFolder = inputFolder.listFiles(new TextFileFilter());
-        //configuration.set("inputFiles", createFilesListString(filesInFolder));
-        setInputFiles(Arrays.asList(filesInFolder));
+        if(inputFolder != null){
+            File[] filesInFolder = inputFolder.listFiles(new TextFileFilter(".txt"));
+            //configuration.set("inputFiles", createFilesListString(filesInFolder));
+            setInputFiles(Arrays.asList(filesInFolder));
+        }
     }
     
     private List inputFiles;
@@ -151,6 +158,8 @@ public class Project implements Serializable{
      */
     public void setAlgorithm(Algorithm algorithm) {
         this.algorithm = algorithm;
+        diffEncrypt();
+        refreshFiles();
     }
 
     public Algorithm getAlgorithm() {
@@ -159,7 +168,9 @@ public class Project implements Serializable{
     
     public void encrypt(File file) {
         if(algorithm != null){
-            File output = new File(outputFolder, file.getName());
+            File output = new File(outputFolder, 
+                    changeExtension(file.getName(), "jcrypt"));
+            
             try {
                 FileWriter fr = new FileWriter(output);
                 fr.write(algorithm.encrypt(readFile(file)));
@@ -171,10 +182,43 @@ public class Project implements Serializable{
     }
     
     public String decrypt(File file) {
-        return algorithm.decrypt(readFile(file));
+        if(algorithm != null){
+            return algorithm.decrypt(readFile(file));
+        }
+        return "";
     }
     
-    String readFile(File file){
+    private void diffEncrypt() {
+        if(inputFolder != null && outputFolder != null){
+            refreshFiles();
+            
+            for(int i = 0; i < inputFiles.size(); i++){
+                File inputFile = (File) inputFiles.get(i);
+                
+                File outputFile = new File(outputFolder, 
+                        changeExtension(inputFile.getName(), "jcrypt"));
+                
+                if(!outputFiles.contains(outputFile)){
+                    encrypt(inputFile);
+                }
+            }
+        }
+    }
+    
+//    private boolean existsInOutputFolder(String name){
+//        for(int i = 0; i < outputFiles.size(); i++){
+//            File outputFile = (File) outputFiles.get(i);
+//            if(outputFile.getName().equals(name)) return true;
+//        }
+//        return false;
+//    }
+    
+    private String changeExtension(String name, String extension){
+        String[] nameParts = name.split("\\.");
+        return nameParts[0] + "." + extension;
+    }
+    
+    private String readFile(File file){
         StringBuilder sb = new StringBuilder();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -190,6 +234,11 @@ public class Project implements Serializable{
         }
         
         return sb.toString();
+    }
+    
+    private void refreshFiles() {
+        refreshInputFiles();
+        refreshOutputFiles();
     }
     
     private transient final PropertyChangeSupport propertyChangeSupport;
@@ -210,14 +259,5 @@ public class Project implements Serializable{
      */
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
-    }
-
-    
-    private String createFilesListString(File[] files){
-        String str = "";
-        for (File file : files)
-            str += file.getAbsolutePath() + "; ";
-        
-        return str;
     }
 }

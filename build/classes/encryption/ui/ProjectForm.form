@@ -171,11 +171,8 @@
     <Component class="javax.swing.JComboBox" name="algorithmComboBox">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="4">
-            <StringItem index="0" value="Item 1"/>
-            <StringItem index="1" value="Item 2"/>
-            <StringItem index="2" value="Item 3"/>
-            <StringItem index="3" value="Item 4"/>
+          <StringArray count="1">
+            <StringItem index="0" value="Election 1876 Cipher"/>
           </StringArray>
         </Property>
         <Property name="doubleBuffered" type="boolean" value="true"/>
@@ -196,7 +193,7 @@
     </Component>
     <Container class="javax.swing.JSplitPane" name="filesSplitPane">
       <Properties>
-        <Property name="dividerLocation" type="int" value="240"/>
+        <Property name="dividerLocation" type="int" value="350"/>
         <Property name="doubleBuffered" type="boolean" value="true"/>
       </Properties>
 
@@ -217,9 +214,11 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <Component id="inputFilesLabel" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="146" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="encryptSelectedButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="jScrollPane3" pref="0" max="32767" attributes="0"/>
+                          <Component id="jScrollPane3" pref="326" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -229,9 +228,12 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="inputFilesLabel" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="inputFilesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="encryptSelectedButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane3" pref="467" max="32767" attributes="0"/>
+                      <Component id="jScrollPane3" pref="455" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -254,17 +256,25 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
-                <Component class="javax.swing.JList" name="jList1">
+                <Component class="javax.swing.JList" name="inputFilesList">
                   <Properties>
                     <Property name="selectionMode" type="int" value="0"/>
                     <Property name="doubleBuffered" type="boolean" value="true"/>
                   </Properties>
                   <BindingProperties>
-                    <BindingProperty name="elements" source="project" sourcePath="${inputFiles}" target="jList1" targetPath="elements" updateStrategy="0" immediately="false"/>
+                    <BindingProperty name="elements" source="project" sourcePath="${inputFiles}" target="inputFilesList" targetPath="elements" updateStrategy="0" immediately="false"/>
                   </BindingProperties>
                 </Component>
               </SubComponents>
             </Container>
+            <Component class="javax.swing.JButton" name="encryptSelectedButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Encrypt Selected"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="encryptSelectedButtonActionPerformed"/>
+              </Events>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="rightPanel">
@@ -282,9 +292,11 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <Component id="outputFilesLabel" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="321" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="decryptSelectedButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="jScrollPane4" max="32767" attributes="0"/>
+                          <Component id="jScrollPane4" pref="402" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -294,9 +306,12 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="outputFilesLabel" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="outputFilesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="decryptSelectedButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane4" pref="467" max="32767" attributes="0"/>
+                      <Component id="jScrollPane4" pref="455" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -319,16 +334,27 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
-                <Component class="javax.swing.JList" name="jList2">
+                <Component class="javax.swing.JList" name="outputFilesList">
                   <Properties>
                     <Property name="doubleBuffered" type="boolean" value="true"/>
                   </Properties>
                   <BindingProperties>
-                    <BindingProperty name="elements" source="project" sourcePath="${outputFiles}" target="jList2" targetPath="elements" updateStrategy="0" immediately="false"/>
+                    <BindingProperty name="elements" source="project" sourcePath="${outputFiles}" target="outputFilesList" targetPath="elements" updateStrategy="0" immediately="false"/>
                   </BindingProperties>
+                  <Events>
+                    <EventHandler event="valueChanged" listener="javax.swing.event.ListSelectionListener" parameters="javax.swing.event.ListSelectionEvent" handler="outputFilesListValueChanged"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>
+            <Component class="javax.swing.JButton" name="decryptSelectedButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Decrypt Selected"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="decryptSelectedButtonActionPerformed"/>
+              </Events>
+            </Component>
           </SubComponents>
         </Container>
       </SubComponents>
