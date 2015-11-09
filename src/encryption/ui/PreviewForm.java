@@ -31,7 +31,7 @@ public class PreviewForm extends javax.swing.JFrame {
         textArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Decrypted Text");
+        setTitle("Preview");
 
         textArea.setColumns(20);
         textArea.setRows(5);

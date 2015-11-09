@@ -15,7 +15,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -158,6 +158,7 @@ public class Project implements Serializable{
      */
     public void setAlgorithm(Algorithm algorithm) {
         this.algorithm = algorithm;
+        cleanOutputFolder();
         diffEncrypt();
         refreshFiles();
     }
@@ -205,20 +206,24 @@ public class Project implements Serializable{
         }
     }
     
-//    private boolean existsInOutputFolder(String name){
-//        for(int i = 0; i < outputFiles.size(); i++){
-//            File outputFile = (File) outputFiles.get(i);
-//            if(outputFile.getName().equals(name)) return true;
-//        }
-//        return false;
-//    }
+    private void cleanOutputFolder() {
+        refreshOutputFiles();
+        for(int i = 0; i < outputFiles.size(); i++){
+            File file = (File) outputFiles.get(i);
+            try {
+                Files.delete(file.toPath());
+            } catch (IOException ex) {
+                Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
     
     private String changeExtension(String name, String extension){
         String[] nameParts = name.split("\\.");
         return nameParts[0] + "." + extension;
     }
     
-    private String readFile(File file){
+    public String readFile(File file){
         StringBuilder sb = new StringBuilder();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));

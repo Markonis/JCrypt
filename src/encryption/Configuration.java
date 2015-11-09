@@ -23,6 +23,10 @@ public class Configuration {
     
     private Map<String, String> map;
     
+    public Configuration() {
+        map = new HashMap<String, String>();
+    }
+    
     public Configuration(File configFile) 
             throws FileNotFoundException, IOException, Exception {
         
