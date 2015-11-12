@@ -16,8 +16,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,11 +29,10 @@ import java.util.logging.Logger;
  * @author marko
  */
 
-public class Project implements Serializable{
+public class Project implements Serializable {
     
     private Algorithm algorithm;
     
-    private final int BUFFER_SIZE = 10 * 1024;
     
     public Project() {
         propertyChangeSupport = new PropertyChangeSupport(this);
@@ -58,7 +60,6 @@ public class Project implements Serializable{
         this.outputFolder = outputFolder;
         //configuration.set("outputFolder", outputFolder.getAbsolutePath());
         propertyChangeSupport.firePropertyChange(PROP_OUTPUTFOLDER, oldOutputFolder, outputFolder);
-        diffEncrypt();
         refreshFiles();
     }
     
@@ -91,7 +92,6 @@ public class Project implements Serializable{
         this.inputFolder = inputFolder;
         //configuration.set("inputFolder", inputFolder.getAbsolutePath());
         propertyChangeSupport.firePropertyChange(PROP_INPUTFOLDER, oldInputFolder, inputFolder);
-        diffEncrypt();
         refreshFiles();
     }
     
@@ -159,7 +159,6 @@ public class Project implements Serializable{
     public void setAlgorithm(Algorithm algorithm) {
         this.algorithm = algorithm;
         cleanOutputFolder();
-        diffEncrypt();
         refreshFiles();
     }
 
@@ -169,9 +168,7 @@ public class Project implements Serializable{
     
     public void encrypt(File file) {
         if(algorithm != null){
-            File output = new File(outputFolder, 
-                    changeExtension(file.getName(), "jcrypt"));
-            
+            File output = new File(outputFolder, file.getName() + "jcrypt");
             try {
                 FileWriter fr = new FileWriter(output);
                 fr.write(algorithm.encrypt(readFile(file)));
@@ -182,28 +179,37 @@ public class Project implements Serializable{
         }
     }
     
-    public String decrypt(File file) {
+    public String decrypt(File encryptedFile, File folder) {
         if(algorithm != null){
-            return algorithm.decrypt(readFile(file));
+            String originalName = originalName(encryptedFile.getName());
+            File outputFile = new File(folder, originalName);
+            try {
+                FileWriter fr = new FileWriter(outputFile);
+                fr.write(algorithm.decrypt(readFile(encryptedFile)));
+                fr.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return "";
     }
     
-    private void diffEncrypt() {
+    public List<File> diffFolders() {
+        List<File> diff = new ArrayList<File>();
         if(inputFolder != null && outputFolder != null){
             refreshFiles();
             
             for(int i = 0; i < inputFiles.size(); i++){
                 File inputFile = (File) inputFiles.get(i);
                 
-                File outputFile = new File(outputFolder, 
-                        changeExtension(inputFile.getName(), "jcrypt"));
+                File outputFile = new File(outputFolder, inputFile.getName() + ".jcrypt");
                 
                 if(!outputFiles.contains(outputFile)){
-                    encrypt(inputFile);
+                    diff.add(inputFile);
                 }
             }
         }
+        return diff;
     }
     
     private void cleanOutputFolder() {
@@ -218,9 +224,8 @@ public class Project implements Serializable{
         }
     }
     
-    private String changeExtension(String name, String extension){
-        String[] nameParts = name.split("\\.");
-        return nameParts[0] + "." + extension;
+    private String originalName(String name){
+        return name.substring(0, name.length() - 6);
     }
     
     public String readFile(File file){
@@ -239,6 +244,10 @@ public class Project implements Serializable{
         }
         
         return sb.toString();
+    }
+    
+    public void writeFile(File file, String content){
+        
     }
     
     private void refreshFiles() {

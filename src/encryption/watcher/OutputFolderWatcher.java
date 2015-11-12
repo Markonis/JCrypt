@@ -5,7 +5,6 @@
 package encryption.watcher;
 
 import encryption.Project;
-import encryption.watcher.ProjectFolderWatcher;
 import java.io.File;
 
 /**

@@ -6,6 +6,7 @@
 package encryption.ui;
 
 import encryption.Configuration;
+import encryption.EncryptionWorker;
 import encryption.watcher.InputFolderWatcher;
 import encryption.watcher.OutputFolderWatcher;
 import encryption.Project;
@@ -26,12 +27,14 @@ public class ProjectForm extends javax.swing.JPanel {
     
     private InputFolderWatcher inputWatcher;
     private OutputFolderWatcher outputWatcher;
+    private EncryptionWorker worker;
     
     /**
      * Creates new form ProjectForm
      */
     public ProjectForm() {
         initComponents();
+        worker = new EncryptionWorker(project);
     }
 
     /**
@@ -321,11 +324,11 @@ public class ProjectForm extends javax.swing.JPanel {
         if(ret == JFileChooser.APPROVE_OPTION){
             project.setInputFolder(inputFolderChooser.getSelectedFile());
             if(inputWatcher != null) inputWatcher.setWatch(false);
-            inputWatcher = new InputFolderWatcher(project);
+            inputWatcher = new InputFolderWatcher(project, worker);
             inputWatcher.start();
+            worker.start();
+            worker.addDiff();
         }
-            
-        
     }//GEN-LAST:event_chooseInputFolderButtonActionPerformed
 
     private void chooseOutputFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseOutputFolderButtonActionPerformed
@@ -335,6 +338,7 @@ public class ProjectForm extends javax.swing.JPanel {
             if(outputWatcher != null) outputWatcher.setWatch(false);
             outputWatcher = new OutputFolderWatcher(project);
             outputWatcher.start();
+            worker.addDiff();
         }
     }//GEN-LAST:event_chooseOutputFolderButtonActionPerformed
 
@@ -351,6 +355,7 @@ public class ProjectForm extends javax.swing.JPanel {
                 }else{
                     project.setAlgorithm(new Algorithm(configuration));
                 }
+                worker.addDiff();
             } catch (Exception ex) {
                 Logger.getLogger(ProjectForm.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -364,8 +369,8 @@ public class ProjectForm extends javax.swing.JPanel {
 
     private void decryptSelectedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decryptSelectedButtonActionPerformed
         File file = (File) outputFilesList.getModel().getElementAt(outputFilesList.getSelectedIndex());
-        PreviewForm preview = new PreviewForm(project.decrypt(file));
-        preview.setVisible(true);
+//        PreviewForm preview = new PreviewForm(project.decrypt(file));
+//        preview.setVisible(true);
     }//GEN-LAST:event_decryptSelectedButtonActionPerformed
 
     private void showEncryptedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showEncryptedButtonActionPerformed
