@@ -6,10 +6,12 @@
 package encryption.ui;
 
 import encryption.Configuration;
-import encryption.EncryptionWorker;
+import encryption.Worker;
+import encryption.Job;
 import encryption.watcher.InputFolderWatcher;
 import encryption.watcher.OutputFolderWatcher;
 import encryption.Project;
+import encryption.algorithm.A51;
 import encryption.algorithm.Algorithm;
 import encryption.algorithm.DoubleTransposition;
 import encryption.algorithm.Election1876Cipher;
@@ -27,14 +29,14 @@ public class ProjectForm extends javax.swing.JPanel {
     
     private InputFolderWatcher inputWatcher;
     private OutputFolderWatcher outputWatcher;
-    private EncryptionWorker worker;
+    private Worker worker;
     
     /**
      * Creates new form ProjectForm
      */
     public ProjectForm() {
         initComponents();
-        worker = new EncryptionWorker(project);
+        worker = new Worker(project);
     }
 
     /**
@@ -49,6 +51,7 @@ public class ProjectForm extends javax.swing.JPanel {
 
         inputFolderChooser = new javax.swing.JFileChooser();
         outputFolderChooser = new javax.swing.JFileChooser();
+        decryptionOutputFolderChooser = new javax.swing.JFileChooser();
         algorithmConfigurationChooser = new javax.swing.JFileChooser();
         project = new encryption.Project();
         inputFolderTextField = new javax.swing.JTextField();
@@ -68,13 +71,11 @@ public class ProjectForm extends javax.swing.JPanel {
         jScrollPane3 = new javax.swing.JScrollPane();
         inputFilesList = new javax.swing.JList();
         encryptSelectedButton = new javax.swing.JButton();
-        showOriginalButton = new javax.swing.JButton();
         rightPanel = new javax.swing.JPanel();
         outputFilesLabel = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         outputFilesList = new javax.swing.JList();
         decryptSelectedButton = new javax.swing.JButton();
-        showEncryptedButton = new javax.swing.JButton();
 
         inputFolderChooser.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
 
@@ -85,6 +86,8 @@ public class ProjectForm extends javax.swing.JPanel {
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, project, org.jdesktop.beansbinding.ELProperty.create("${outputFolder}"), outputFolderChooser, org.jdesktop.beansbinding.BeanProperty.create("selectedFile"));
         bindingGroup.addBinding(binding);
+
+        decryptionOutputFolderChooser.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
 
         inputFolderTextField.setEditable(false);
         inputFolderTextField.setDoubleBuffered(true);
@@ -125,7 +128,7 @@ public class ProjectForm extends javax.swing.JPanel {
         algorithmLabel.setText("Encryption Algorithm");
         algorithmLabel.setDoubleBuffered(true);
 
-        algorithmComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Election 1876 Cipher", "Double Transposition" }));
+        algorithmComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Election 1876 Cipher", "Double Transposition", "A5/1" }));
         algorithmComboBox.setDoubleBuffered(true);
 
         chooseAlgorithmConfigurationButton.setText("Browse Configuration");
@@ -161,13 +164,6 @@ public class ProjectForm extends javax.swing.JPanel {
             }
         });
 
-        showOriginalButton.setText("Show Original");
-        showOriginalButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showOriginalButtonActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout leftPanelLayout = new javax.swing.GroupLayout(leftPanel);
         leftPanel.setLayout(leftPanelLayout);
         leftPanelLayout.setHorizontalGroup(
@@ -179,10 +175,8 @@ public class ProjectForm extends javax.swing.JPanel {
                         .addComponent(inputFilesLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(encryptSelectedButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(showOriginalButton)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane3))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE))
                 .addContainerGap())
         );
         leftPanelLayout.setVerticalGroup(
@@ -191,8 +185,7 @@ public class ProjectForm extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(inputFilesLabel)
-                    .addComponent(encryptSelectedButton)
-                    .addComponent(showOriginalButton))
+                    .addComponent(encryptSelectedButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
                 .addContainerGap())
@@ -220,13 +213,6 @@ public class ProjectForm extends javax.swing.JPanel {
             }
         });
 
-        showEncryptedButton.setText("Show Encrypted");
-        showEncryptedButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showEncryptedButtonActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout rightPanelLayout = new javax.swing.GroupLayout(rightPanel);
         rightPanel.setLayout(rightPanelLayout);
         rightPanelLayout.setHorizontalGroup(
@@ -238,10 +224,8 @@ public class ProjectForm extends javax.swing.JPanel {
                         .addComponent(outputFilesLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(decryptSelectedButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(showEncryptedButton)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
                 .addContainerGap())
         );
         rightPanelLayout.setVerticalGroup(
@@ -250,8 +234,7 @@ public class ProjectForm extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(rightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(outputFilesLabel)
-                    .addComponent(decryptSelectedButton)
-                    .addComponent(showEncryptedButton))
+                    .addComponent(decryptSelectedButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
                 .addContainerGap())
@@ -326,7 +309,7 @@ public class ProjectForm extends javax.swing.JPanel {
             if(inputWatcher != null) inputWatcher.setWatch(false);
             inputWatcher = new InputFolderWatcher(project, worker);
             inputWatcher.start();
-            worker.start();
+            worker.startWorking();
             worker.addDiff();
         }
     }//GEN-LAST:event_chooseInputFolderButtonActionPerformed
@@ -352,9 +335,12 @@ public class ProjectForm extends javax.swing.JPanel {
                     project.setAlgorithm(new Election1876Cipher(configuration));
                 }else if("Double Transposition".equals(algorithmName)){
                     project.setAlgorithm(new DoubleTransposition(configuration));
+                }else if("A5/1".equals(algorithmName)){
+                    project.setAlgorithm(new A51(configuration));
                 }else{
                     project.setAlgorithm(new Algorithm(configuration));
                 }
+                
                 worker.addDiff();
             } catch (Exception ex) {
                 Logger.getLogger(ProjectForm.class.getName()).log(Level.SEVERE, null, ex);
@@ -364,26 +350,17 @@ public class ProjectForm extends javax.swing.JPanel {
 
     private void encryptSelectedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_encryptSelectedButtonActionPerformed
         File file = (File) inputFilesList.getModel().getElementAt(inputFilesList.getSelectedIndex());
-        project.encrypt(file);
+        worker.addToQueue(new Job(file, null));
     }//GEN-LAST:event_encryptSelectedButtonActionPerformed
 
     private void decryptSelectedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decryptSelectedButtonActionPerformed
         File file = (File) outputFilesList.getModel().getElementAt(outputFilesList.getSelectedIndex());
-//        PreviewForm preview = new PreviewForm(project.decrypt(file));
-//        preview.setVisible(true);
+        int ret = decryptionOutputFolderChooser.showOpenDialog(this);
+        if(ret == JFileChooser.APPROVE_OPTION){
+            File outputFolder = decryptionOutputFolderChooser.getSelectedFile();
+            worker.addToQueue(new Job(file, outputFolder));
+        }
     }//GEN-LAST:event_decryptSelectedButtonActionPerformed
-
-    private void showEncryptedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showEncryptedButtonActionPerformed
-        File file = (File) outputFilesList.getModel().getElementAt(outputFilesList.getSelectedIndex());
-        PreviewForm preview = new PreviewForm(project.readFile(file));
-        preview.setVisible(true);
-    }//GEN-LAST:event_showEncryptedButtonActionPerformed
-
-    private void showOriginalButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showOriginalButtonActionPerformed
-        File file = (File) inputFilesList.getModel().getElementAt(inputFilesList.getSelectedIndex());
-        PreviewForm preview = new PreviewForm(project.readFile(file));
-        preview.setVisible(true);
-    }//GEN-LAST:event_showOriginalButtonActionPerformed
 
     public Project getProject() {
         return project;
@@ -402,6 +379,7 @@ public class ProjectForm extends javax.swing.JPanel {
     private javax.swing.JButton chooseInputFolderButton;
     private javax.swing.JButton chooseOutputFolderButton;
     private javax.swing.JButton decryptSelectedButton;
+    private javax.swing.JFileChooser decryptionOutputFolderChooser;
     private javax.swing.JButton encryptSelectedButton;
     private javax.swing.JSplitPane filesSplitPane;
     private javax.swing.JLabel inputFilesLabel;
@@ -421,8 +399,6 @@ public class ProjectForm extends javax.swing.JPanel {
     private javax.swing.JTextField outputFolderTextField;
     private encryption.Project project;
     private javax.swing.JPanel rightPanel;
-    private javax.swing.JButton showEncryptedButton;
-    private javax.swing.JButton showOriginalButton;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

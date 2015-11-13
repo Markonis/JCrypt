@@ -6,11 +6,14 @@
 package encryption;
 
 import encryption.algorithm.Algorithm;
-import encryption.ui.TextFileFilter;
+import encryption.algorithm.StreamAlgorithm;
+import encryption.ui.ExtensionFileFilter;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,9 +21,7 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,7 +66,7 @@ public class Project implements Serializable {
     
     public synchronized void refreshOutputFiles(){
         if(outputFolder != null){
-            File[] filesInFolder = outputFolder.listFiles(new TextFileFilter(".jcrypt"));
+            File[] filesInFolder = outputFolder.listFiles(new ExtensionFileFilter(".jcrypt", null));
             setOutputFiles(Arrays.asList(filesInFolder));
         }
     }
@@ -97,7 +98,7 @@ public class Project implements Serializable {
     
     public synchronized void refreshInputFiles(){
         if(inputFolder != null){
-            File[] filesInFolder = inputFolder.listFiles(new TextFileFilter(".txt"));
+            File[] filesInFolder = inputFolder.listFiles(new ExtensionFileFilter(null, ".jcrypt"));
             //configuration.set("inputFiles", createFilesListString(filesInFolder));
             setInputFiles(Arrays.asList(filesInFolder));
         }
@@ -150,6 +151,11 @@ public class Project implements Serializable {
         propertyChangeSupport.firePropertyChange(PROP_OUTPUTFILES, oldOutputFiles, outputFiles);
     }
     
+    
+    private void refreshFiles() {
+        refreshInputFiles();
+        refreshOutputFiles();
+    }
 
     /**
      * Set the value of algorithm
@@ -166,32 +172,41 @@ public class Project implements Serializable {
         return algorithm;
     }
     
-    public void encrypt(File file) {
+    public void encrypt(File input) {
         if(algorithm != null){
-            File output = new File(outputFolder, file.getName() + "jcrypt");
-            try {
-                FileWriter fr = new FileWriter(output);
-                fr.write(algorithm.encrypt(readFile(file)));
-                fr.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
+            File output = new File(outputFolder, encryptedFileName(input.getName()));
+            if(algorithm instanceof StreamAlgorithm){
+                // Stream algorithm
+                StreamAlgorithm sa = (StreamAlgorithm) algorithm;
+                try {
+                    sa.encrypt(
+                            new FileInputStream(input), 
+                            new FileOutputStream(output));
+                }catch(IOException e){}
+            }else{
+                // Simple algorithm
+                writeTextFile(output, algorithm.encrypt(readTextFile(input)));
             }
         }
     }
     
-    public String decrypt(File encryptedFile, File folder) {
+    public void decrypt(File input, File folder) {
         if(algorithm != null){
-            String originalName = originalName(encryptedFile.getName());
-            File outputFile = new File(folder, originalName);
-            try {
-                FileWriter fr = new FileWriter(outputFile);
-                fr.write(algorithm.decrypt(readFile(encryptedFile)));
-                fr.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
+            String originalName = originalFileName(input.getName());
+            File output = new File(folder, originalName);
+            if(algorithm instanceof StreamAlgorithm){
+                // Stream algorithm
+                StreamAlgorithm sa = (StreamAlgorithm) algorithm;
+                try {
+                    sa.decrypt(
+                            new FileInputStream(input), 
+                            new FileOutputStream(output));
+                }catch(IOException e){}
+            }else{
+                // Simple algorithm
+                writeTextFile(output, algorithm.decrypt(readTextFile(input)));
             }
         }
-        return "";
     }
     
     public List<File> diffFolders() {
@@ -202,7 +217,8 @@ public class Project implements Serializable {
             for(int i = 0; i < inputFiles.size(); i++){
                 File inputFile = (File) inputFiles.get(i);
                 
-                File outputFile = new File(outputFolder, inputFile.getName() + ".jcrypt");
+                File outputFile = new File(outputFolder, 
+                        encryptedFileName(inputFile.getName()));
                 
                 if(!outputFiles.contains(outputFile)){
                     diff.add(inputFile);
@@ -224,11 +240,15 @@ public class Project implements Serializable {
         }
     }
     
-    private String originalName(String name){
-        return name.substring(0, name.length() - 6);
+    private String originalFileName(String name){
+        return name.substring(0, name.length() - 7);
     }
     
-    public String readFile(File file){
+    private String encryptedFileName(String name) {
+        return name + ".jcrypt";
+    }
+    
+    public String readTextFile(File file){
         StringBuilder sb = new StringBuilder();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -242,17 +262,17 @@ public class Project implements Serializable {
         } catch (Exception e) {
             
         }
-        
         return sb.toString();
     }
     
-    public void writeFile(File file, String content){
-        
-    }
-    
-    private void refreshFiles() {
-        refreshInputFiles();
-        refreshOutputFiles();
+    public void writeTextFile(File file, String content){
+        try {
+            FileWriter fr = new FileWriter(file);
+            fr.write(content);
+            fr.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private transient final PropertyChangeSupport propertyChangeSupport;

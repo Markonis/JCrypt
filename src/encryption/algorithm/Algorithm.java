@@ -12,7 +12,7 @@ import encryption.Configuration;
  */
 public class Algorithm {
 
-    private Configuration configuration;
+    protected Configuration configuration;
     private String name;
 
     public Algorithm(Configuration configuration) {

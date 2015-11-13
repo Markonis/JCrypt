@@ -4,7 +4,8 @@
  */
 package encryption.watcher;
 
-import encryption.EncryptionWorker;
+import encryption.Worker;
+import encryption.Job;
 import encryption.Project;
 import java.io.File;
 
@@ -14,12 +15,11 @@ import java.io.File;
  */
 public class InputFolderWatcher extends ProjectFolderWatcher{
     
-    private EncryptionWorker worker;
+    private Worker worker;
     
-    public InputFolderWatcher(Project project, EncryptionWorker worker) {
+    public InputFolderWatcher(Project project, Worker worker) {
         super(project);
         this.worker = worker;
-        worker.addToQueue(project.getInputFiles());
     }
 
     @Override
@@ -32,7 +32,7 @@ public class InputFolderWatcher extends ProjectFolderWatcher{
         if("ENTRY_CREATE".equals(eventKind) || "ENTRY_MODIFY".equals(eventKind)){
             File inputFile = new File(project.getInputFolder(), fileName);
             if(inputFile.exists()){
-                worker.addToQueue(inputFile);
+                worker.addToQueue(new Job(inputFile, null));
             }
         }
         project.refreshInputFiles();

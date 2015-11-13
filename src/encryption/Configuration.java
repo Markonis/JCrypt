@@ -36,7 +36,7 @@ public class Configuration {
         String configLine = null;
         while((configLine = br.readLine()) != null){
             String parsedLine[] = parseLine(configLine);
-            map.put(parsedLine[0], parsedLine[1]);
+            map.put(parsedLine[0].trim(), parsedLine[1].trim());
         }
     }
     
