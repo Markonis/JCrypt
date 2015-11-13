@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  */
 
 public abstract class ProjectFolderWatcher extends Thread{
-    private WatchService watchService;
+    protected WatchService watchService;
     
     protected Project project;
     private boolean watch;
@@ -38,6 +38,7 @@ public abstract class ProjectFolderWatcher extends Thread{
         this.watch = watch;
     }
     
+    public void registerEvents(Path path) throws Exception {}
     
     @Override
     public void run() {
@@ -49,12 +50,7 @@ public abstract class ProjectFolderWatcher extends Thread{
 
             try {
                 watchService = FileSystems.getDefault().newWatchService();
-
-                path.register(watchService, 
-                        java.nio.file.StandardWatchEventKinds.ENTRY_DELETE, 
-                        java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY,
-                        java.nio.file.StandardWatchEventKinds.ENTRY_CREATE); 
-
+                registerEvents(path);
                 watch = true;
 
                 // get the first event before looping

@@ -8,6 +8,7 @@ import encryption.Worker;
 import encryption.Job;
 import encryption.Project;
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  *
@@ -22,6 +23,16 @@ public class InputFolderWatcher extends ProjectFolderWatcher{
         this.worker = worker;
     }
 
+    @Override
+    public void registerEvents(Path path) throws Exception{
+        path.register(watchService, 
+                        java.nio.file.StandardWatchEventKinds.ENTRY_DELETE, 
+                        java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY,
+                        java.nio.file.StandardWatchEventKinds.ENTRY_CREATE); 
+    }
+
+    
+    
     @Override
     protected File watchedFolder() {
         return project.getInputFolder();

@@ -6,6 +6,7 @@ package encryption.watcher;
 
 import encryption.Project;
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  *
@@ -17,6 +18,15 @@ public class OutputFolderWatcher extends ProjectFolderWatcher{
        super(project);
     }
 
+    @Override
+    public void registerEvents(Path path) throws Exception {
+        path.register(watchService, 
+                        java.nio.file.StandardWatchEventKinds.ENTRY_DELETE, 
+                        java.nio.file.StandardWatchEventKinds.ENTRY_CREATE); 
+    }
+
+    
+    
     @Override
     protected File watchedFolder() {
         return project.getOutputFolder();
