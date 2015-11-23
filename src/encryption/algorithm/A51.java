@@ -90,13 +90,6 @@ public class A51 extends StreamAlgorithm {
         super.encrypt(in, out);
     }
 
-    public static void printBytes(byte[] bytes){
-        for(int i = 0; i < bytes.length; i++){
-            System.out.print(bytes[i] + " ");
-        }
-        System.out.println();
-    }
-
     public static void main(String[] args){
         Configuration config = new Configuration();
         String key = "";

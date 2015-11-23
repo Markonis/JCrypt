@@ -60,4 +60,11 @@ public class StreamAlgorithm extends Algorithm{
             result += bits[i] << i;
         return result;
     }
+
+    public static void printBytes(byte[] bytes){
+        for(int i = 0; i < bytes.length; i++){
+            System.out.print(bytes[i] + " ");
+        }
+        System.out.println();
+    }
 }
