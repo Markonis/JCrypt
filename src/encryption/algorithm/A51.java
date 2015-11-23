@@ -7,17 +7,14 @@ package encryption.algorithm;
 import encryption.Configuration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author marko
  */
-public class A51 extends Algorithm implements StreamAlgorithm{
+public class A51 extends StreamAlgorithm {
     byte[] key, xReg, yReg, zReg;
     int[] voteIndexes, xTIndexes, yTIndexes, zTIndexes;
 
@@ -31,22 +28,14 @@ public class A51 extends Algorithm implements StreamAlgorithm{
             key[i] = Byte.parseByte(bits[i]);
 
         // Initialize majority vote indexes
-        voteIndexes = parseIndexArray(configuration.get("vote"));
-        xTIndexes = parseIndexArray(configuration.get("xT"));
-        yTIndexes = parseIndexArray(configuration.get("yT"));
-        zTIndexes = parseIndexArray(configuration.get("zT"));
+        voteIndexes = configuration.parseIndexArray("vote");
+        xTIndexes = configuration.parseIndexArray("xT");
+        yTIndexes = configuration.parseIndexArray("yT");
+        zTIndexes = configuration.parseIndexArray("zT");
 
         xReg = new byte[19];
         yReg = new byte[22];
         zReg = new byte[23];
-    }
-
-    private int[] parseIndexArray(String str) {
-        String[] parts = str.split(" ");
-        int[] indexes = new int[parts.length];
-        for(int i = 0; i < indexes.length; i++)
-            indexes[i] = Integer.parseInt(parts[i]);
-        return indexes;
     }
 
     private void resetRegisters() {
@@ -59,21 +48,6 @@ public class A51 extends Algorithm implements StreamAlgorithm{
                 zReg[i - xReg.length - yReg.length] = key[i];
             }
         }
-    }
-
-    private byte[] explodeByte(byte b) {
-        byte[] result = new byte[8];
-        for(int i= 0; i < 8; i++){
-            result[i] = (byte) ((b & (1 << i)) >> i);
-        }
-        return result;
-    }
-
-    private byte implodeByte(byte[] bits) {
-        byte result = 0;
-        for(int i = 0; i < 8; i++)
-            result += bits[i] << i;
-        return result;
     }
 
     private void shiftRegister(byte[] reg, byte t){
@@ -102,31 +76,18 @@ public class A51 extends Algorithm implements StreamAlgorithm{
     }
 
     @Override
-    public void encrypt(InputStream in, OutputStream out) {
-        resetRegisters();
-        int read;
-        try {
-            while((read = in.read()) != -1){
-                byte inputByte = (byte) read;
-                byte[] bits = explodeByte(inputByte);
+    public byte encryptByte(byte in) {
+        byte[] bits = explodeByte(in);
+        for(int i = 0; i < 8; i++)
+            bits[i] ^= generateNextSBit();
 
-                for(int i = 0; i < 8; i++)
-                    bits[i] ^= generateNextSBit();
-
-                byte outputByte = implodeByte(bits);
-                out.write((int) outputByte);
-            }
-
-            in.close();
-            out.close();
-        } catch (IOException ex) {
-            Logger.getLogger(A51.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        return implodeByte(bits);
     }
 
     @Override
-    public void decrypt(InputStream in, OutputStream out) {
-        encrypt(in, out);
+    public void encrypt(InputStream in, OutputStream out) {
+        resetRegisters();
+        super.encrypt(in, out);
     }
 
     public static void printBytes(byte[] bytes){

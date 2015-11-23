@@ -20,26 +20,26 @@ import java.util.Map.Entry;
  * @author marko
  */
 public class Configuration {
-    
+
     private Map<String, String> map;
-    
+
     public Configuration() {
         map = new HashMap<String, String>();
     }
-    
-    public Configuration(File configFile) 
+
+    public Configuration(File configFile)
             throws FileNotFoundException, IOException, Exception {
-        
+
         map = new HashMap<String, String>();
         BufferedReader br = new BufferedReader(new FileReader(configFile));
-        
+
         String configLine = null;
         while((configLine = br.readLine()) != null){
             String parsedLine[] = parseLine(configLine);
             map.put(parsedLine[0].trim(), parsedLine[1].trim());
         }
     }
-    
+
     private String[] parseLine(String line) throws Exception{
         String[] result = new String[2];
         int i = 0;
@@ -52,15 +52,15 @@ public class Configuration {
         }
         return result;
     }
-    
+
     public String get(String key){
         return map.get(key);
     }
-    
+
     public String set(String key, String value){
         return map.put(key, value);
     }
-    
+
     public void saveToFile(File out) throws IOException{
         FileWriter fr = new FileWriter(out);
         String str = "";
@@ -69,8 +69,16 @@ public class Configuration {
             String value = entry.getValue();
             str += key + ": " + value + "\n";
         }
-        
+
         fr.write(str);
         fr.close();
+    }
+
+    public int[] parseIndexArray(String key) {
+        String[] parts = get(key).split(" ");
+        int[] indexes = new int[parts.length];
+        for(int i = 0; i < indexes.length; i++)
+            indexes[i] = Integer.parseInt(parts[i]);
+        return indexes;
     }
 }
