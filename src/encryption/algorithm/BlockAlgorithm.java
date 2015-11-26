@@ -36,12 +36,10 @@ public class BlockAlgorithm extends StreamAlgorithm {
 
     @Override
     public void encrypt(InputStream in, OutputStream out) {
-        int read;
+        int inputByte;
         try {
             int i = 0;
-            
-            while((read = in.read()) != -1){
-                byte inputByte = (byte) read;
+            while((inputByte = in.read()) != -1){
                 blockBuffer[i++] = inputByte;
                 if(i == blockLength){
                     i = 0;
