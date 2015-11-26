@@ -16,6 +16,7 @@ import encryption.algorithm.Algorithm;
 import encryption.algorithm.DoubleTransposition;
 import encryption.algorithm.Election1876Cipher;
 import encryption.algorithm.Tea;
+import encryption.algorithm.XTea;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -129,7 +130,7 @@ public class ProjectForm extends javax.swing.JPanel {
         algorithmLabel.setText("Encryption Algorithm");
         algorithmLabel.setDoubleBuffered(true);
 
-        algorithmComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Election 1876 Cipher", "Double Transposition", "A5/1", "Tea" }));
+        algorithmComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Election 1876 Cipher", "Double Transposition", "A5/1", "Tea", "XTea" }));
         algorithmComboBox.setDoubleBuffered(true);
 
         chooseAlgorithmConfigurationButton.setText("Browse Configuration");
@@ -340,6 +341,8 @@ public class ProjectForm extends javax.swing.JPanel {
                     project.setAlgorithm(new A51(configuration));
                 }else if("Tea".equals(algorithmName)){
                     project.setAlgorithm(new Tea(configuration));
+                }else if("XTea".equals(algorithmName)){
+                    project.setAlgorithm(new XTea(configuration));
                 }else{
                     project.setAlgorithm(new Algorithm(configuration));
                 }

@@ -5,6 +5,7 @@
 package encryption.algorithm;
 
 import encryption.Configuration;
+import static encryption.algorithm.StreamAlgorithm.printBytes;
 
 /**
  *

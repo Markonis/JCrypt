@@ -9,18 +9,19 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import org.junit.Assert;
 import org.junit.Test;
+
 /**
  *
  * @author marko
  */
-public class TeaTest {
+public class XTeaTest{
     
     @Test 
     public void testEncryptDecryptBlock() {
         Configuration config = new Configuration();
         config.set("blockLength", "8");
         config.set("key", "111 222 333 444");
-        Tea instance = new Tea(config);
+        XTea instance = new XTea(config);
         
         for(int i = 0; i < 1024; i++){
             int[] inputBlock = new int[8];
@@ -29,6 +30,12 @@ public class TeaTest {
             
             int[] encryptedBlock = instance.encryptBlock(inputBlock);
             int[] decryptedBlock = instance.decryptBlock(encryptedBlock);
+            
+//            System.out.println("***********************");
+//            StreamAlgorithm.printBytes(inputBlock);
+//            StreamAlgorithm.printBytes(encryptedBlock);
+//            StreamAlgorithm.printBytes(decryptedBlock);
+//            System.out.println("***********************");
             
             Assert.assertArrayEquals(inputBlock, decryptedBlock);
         }
@@ -39,10 +46,10 @@ public class TeaTest {
         Configuration config = new Configuration();
         config.set("blockLength", "8");
         config.set("key", "111 222 333 444");
-        Tea instance = new Tea(config);
+        XTea instance = new XTea(config);
         
         for(int i = 0; i < 128; i++){
-            byte[] inputBytes = generateRandomBytes(36);
+            byte[] inputBytes = generateRandomBytes(1028);
             
             ByteArrayInputStream in =  new ByteArrayInputStream(inputBytes);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
