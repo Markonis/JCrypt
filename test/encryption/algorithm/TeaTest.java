@@ -4,6 +4,7 @@
  */
 package encryption.algorithm;
 
+import encryption.algorithm.blockEncryptor.Tea;
 import encryption.Configuration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,6 +21,7 @@ public class TeaTest {
         Configuration config = new Configuration();
         config.set("blockLength", "8");
         config.set("key", "111 222 333 444");
+        
         Tea instance = new Tea(config);
         
         for(int i = 0; i < 1024; i++){
@@ -39,7 +41,10 @@ public class TeaTest {
         Configuration config = new Configuration();
         config.set("blockLength", "8");
         config.set("key", "111 222 333 444");
-        Tea instance = new Tea(config);
+        config.set("mode", "default");
+        config.set("encryptor", "Tea");
+        
+        BlockAlgorithm instance = new BlockAlgorithm(config);
         
         for(int i = 0; i < 128; i++){
             byte[] inputBytes = generateRandomBytes(36);

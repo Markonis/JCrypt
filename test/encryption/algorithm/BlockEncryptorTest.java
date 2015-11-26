@@ -5,6 +5,7 @@
 package encryption.algorithm;
 
 import encryption.Configuration;
+import encryption.algorithm.blockEncryptor.BlockEncryptor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,9 +13,9 @@ import org.junit.Test;
  *
  * @author marko
  */
-public class BlockAlgorithmTest {
+public class BlockEncryptorTest {
     
-    public BlockAlgorithmTest() {
+    public BlockEncryptorTest() {
     }
     
     @Test
@@ -23,7 +24,7 @@ public class BlockAlgorithmTest {
         
         Configuration config = new Configuration();
         config.set("blockLength", "8");
-        BlockAlgorithm instance = new BlockAlgorithm(config);
+        BlockEncryptor instance = new BlockEncryptor(config);
         
         int[] bytes = new int[4];
         int imploded, imploded2;

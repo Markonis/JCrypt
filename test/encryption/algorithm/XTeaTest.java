@@ -4,6 +4,7 @@
  */
 package encryption.algorithm;
 
+import encryption.algorithm.blockEncryptor.XTea;
 import encryption.Configuration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -46,7 +47,10 @@ public class XTeaTest{
         Configuration config = new Configuration();
         config.set("blockLength", "8");
         config.set("key", "111 222 333 444");
-        XTea instance = new XTea(config);
+        config.set("mode", "default");
+        config.set("encryptor", "XTea");
+        
+        BlockAlgorithm instance = new BlockAlgorithm(config);
         
         for(int i = 0; i < 128; i++){
             byte[] inputBytes = generateRandomBytes(1028);

@@ -2,16 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package encryption.algorithm;
+package encryption.algorithm.blockEncryptor;
 
 import encryption.Configuration;
-import static encryption.algorithm.StreamAlgorithm.printBytes;
 
 /**
  *
  * @author marko576460725758780550
  */
-public class Tea extends BlockAlgorithm {
+public class Tea extends BlockEncryptor {
     
     int[] key;
     final int ENCRYPT_DELTA = 0x9E3779B9;
