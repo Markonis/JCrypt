@@ -17,20 +17,20 @@ import java.util.logging.Logger;
  */
 public class BlockAlgorithm extends StreamAlgorithm {
     
-    protected byte[] blockBuffer;
+    protected int[] blockBuffer;
     protected int blockLength; // Size of block buffer in bytes
     
     public BlockAlgorithm(Configuration configuration){
         super(configuration);
         blockLength = Integer.parseInt(configuration.get("blockLength"));
-        blockBuffer = new byte[blockLength];
+        blockBuffer = new int[blockLength];
     }
     
-    public byte[] encryptBlock(byte[] in) {
+    public int[] encryptBlock(int[] in) {
         return in;
     }
     
-    public byte[] decryptBlock(byte[] in) {
+    public int[] decryptBlock(int[] in) {
         return in;
     }
 
@@ -45,7 +45,9 @@ public class BlockAlgorithm extends StreamAlgorithm {
                 blockBuffer[i++] = inputByte;
                 if(i == blockLength){
                     i = 0;
-                    out.write(encryptBlock(blockBuffer));
+                    int[] encryptedBlock = encryptBlock(blockBuffer);
+                    for(int j = 0; j < blockLength; j++)
+                        out.write(encryptedBlock[j]);
                 }
             }
             
@@ -64,16 +66,16 @@ public class BlockAlgorithm extends StreamAlgorithm {
 
     @Override
     public void decrypt(InputStream in, OutputStream out) {
-        int read;
+        int inputByte;
         try {
             int i = 0;
-            
-            while((read = in.read()) != -1){
-                byte inputByte = (byte) read;
+            while((inputByte = in.read()) != -1){
                 blockBuffer[i++] = inputByte;
                 if(i == blockLength){
                     i = 0;
-                    out.write(decryptBlock(blockBuffer));
+                    int[] decryptedBlock = decryptBlock(blockBuffer);
+                    for(int j = 0; j < blockLength; j++)
+                        out.write(decryptedBlock[j]);
                 }
             }
             
@@ -88,5 +90,23 @@ public class BlockAlgorithm extends StreamAlgorithm {
         } catch (IOException ex) {
             Logger.getLogger(A51.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public int implodeInt(int[] bytes){
+        int result = 0;
+        for(int i = 0; i < bytes.length; i++){
+            int current = bytes[i];
+            result += current << (i * 8);
+        }
+            
+        return result;
+    }
+    
+    public int[] explodeInt(int in, int count){
+        int[] result = new int[count];
+        long mask = 255;
+        for(int i = 0; i < count; i++)
+            result[i] = (int) ((in & (mask << (i * 8))) >> (i * 8));
+        return result;
     }
 }

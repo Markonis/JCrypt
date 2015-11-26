@@ -63,7 +63,20 @@ public class StreamAlgorithm extends Algorithm{
 
     public static void printBytes(byte[] bytes){
         for(int i = 0; i < bytes.length; i++){
-            System.out.print(bytes[i] + " ");
+            String byteStr = String.valueOf(bytes[i]);
+            while(byteStr.length() < 4) 
+                byteStr = " " + byteStr;
+            System.out.print(byteStr + " ");
+        }
+        System.out.println();
+    }
+    
+    public static void printBytes(int[] bytes){
+        for(int i = 0; i < bytes.length; i++){
+            String byteStr = String.valueOf(bytes[i]);
+            while(byteStr.length() < 4) 
+                byteStr = " " + byteStr;
+            System.out.print(byteStr + " ");
         }
         System.out.println();
     }
